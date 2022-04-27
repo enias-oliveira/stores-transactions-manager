@@ -17,8 +17,8 @@ Ths repository has a minimal CI/CD setup via Github Actions, that automatically 
 
 Heroku will put the server on sleep after some time, so your first interaction with the demo will be a slower than normally
 
-[Development](https://strs-transactions-manager-dev.herokuapp.com)
-[Production](https://strs-transactions-manager.herokuapp.com)
+- [Development](https://strs-transactions-manager-dev.herokuapp.com)
+- [Production](https://strs-transactions-manager-prd.herokuapp.com)
 ## Run Development Env
 
 Clone the project
