@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, Transaction } from '@prisma/client';
-import { addHours, parse } from 'date-fns';
 import { Promise as BBPromise } from 'bluebird';
-
-import { PrismaService } from 'src/database/prisma/prisma.service';
+import { addHours, parse } from 'date-fns';
+import { PrismaService } from '../../database/prisma/prisma.service';
 import {
   CNAB_TRANSACTIONS_SPEC,
   RAW_TRANSACTIONS_TIME_OFFSET,

@@ -14,6 +14,6 @@ export class TransactionEntity {
 }
 
 // Javascript Hack to Round number to 2 Digits
-const roundToTwo = (val: number) => {
+export const roundToTwo = (val: number) => {
   return +(Math.round(Number(val + 'e+2')) + 'e-2');
 };

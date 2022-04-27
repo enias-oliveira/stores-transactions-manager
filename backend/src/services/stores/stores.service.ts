@@ -1,6 +1,10 @@
+import { HttpStatus } from '@nestjs/common';
+import { HttpException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
-import { PrismaService } from 'src/database/prisma/prisma.service';
+import { Promise as BBPromise } from 'bluebird';
+
+import { PrismaService } from '../../database/prisma/prisma.service';
 
 @Injectable()
 export class StoresService {
@@ -13,10 +17,30 @@ export class StoresService {
     where?: Prisma.StoreWhereInput;
     orderBy?: Prisma.StoreOrderByWithRelationInput;
   }) {
-    return this.prisma.store.findMany(params);
+    const stores = await this.prisma.store.findMany(params);
+    return BBPromise.mapSeries(stores, async (store) => ({
+      ...store,
+      totalBalance: await this.storeTransactionsSum(store.id),
+    }));
   }
 
-  async store(params?: Prisma.StoreWhereUniqueInput) {
-    return this.prisma.store.findUnique({ where: params})
+  async store(params: Prisma.StoreWhereUniqueInput) {
+    const store = await this.prisma.store.findUnique({ where: params });
+
+    if (!store) {
+      throw new HttpException('Store not Found', HttpStatus.NOT_FOUND)
+    }
+
+    const totalBalance = await this.storeTransactionsSum(store.id);
+
+    return { ...store, totalBalance };
+  }
+
+  async storeTransactionsSum(id: number) {
+    const aggregate = await this.prisma.transaction.aggregate({
+      where: { storeId: id },
+      _sum: { value: true },
+    });
+    return aggregate?._sum.value ?? 0;
   }
 }

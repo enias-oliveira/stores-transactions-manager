@@ -3,10 +3,10 @@ setup:
   - plan: heroku-postgresql:hobby-dev
 build:
   docker:
-    web: backend/Dockerfile
+    web: Dockerfile.heroku
 release:
-  command:
-    - npm run migrate:deploy && npm run prisma:seed
   image: web
+  command:
+    - cd backend && npm run migrate:deploy && npm run prisma:seed
 run:
-  web: bash -c "npm run start"
+  web: bash -c "cd backend; npm run start & cd ../frontend; node server.js"

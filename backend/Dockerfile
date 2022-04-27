@@ -12,6 +12,7 @@ RUN npx prisma generate
 
 RUN apk add --no-cache bash
 
-
 # expose port
 EXPOSE 5500
+
+CMD ["npm", "run", "start"]

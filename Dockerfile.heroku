@@ -1,0 +1,51 @@
+FROM node:16-alpine AS frontend-deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /frontend-app
+COPY frontend/package.json frontend/package-lock.json ./
+RUN npm ci
+
+FROM node:16-alpine AS frontend-builder
+WORKDIR /frontend-app
+COPY --from=frontend-deps /frontend-app/node_modules ./node_modules
+
+COPY frontend/ .
+RUN npm run build
+
+FROM node:16-alpine AS frontend-runner
+WORKDIR /frontend-app
+ENV NODE_ENV production
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=frontend-builder /frontend-app/public ./public
+COPY --from=frontend-builder /frontend-app/package.json ./package.json
+
+COPY --from=frontend-builder --chown=nextjs:nodejs /frontend-app/.next/standalone ./
+COPY --from=frontend-builder --chown=nextjs:nodejs /frontend-app/.next/static ./.next/static
+
+USER nextjs
+
+EXPOSE 3000
+
+
+FROM node:16.14.2-alpine AS backend
+WORKDIR /backend-app
+COPY backend/package.json /backend-app/package.json
+COPY backend/wait-for-it.sh /backend-app/wait-for-it.sh
+COPY backend/prisma /backend-app/prisma
+
+RUN npm install --silent
+RUN npx prisma generate
+
+COPY backend/. .
+
+EXPOSE 5500
+
+FROM node:16.14.2-alpine AS runner
+WORKDIR /app
+COPY --from=frontend-runner /frontend-app/. ./frontend
+COPY --from=backend /backend-app/. ./backend
+RUN apk add --no-cache bash
+# COPY ./entrypoint.sh .
+# RUN chmod +w ./entrypoint.sh
+# ENTRYPOINT [ "./entrypoint.sh" ]

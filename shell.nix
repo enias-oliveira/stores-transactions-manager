@@ -2,4 +2,4 @@
 
 with pkgs;
 
-mkShell { buildInputs = [ docker-compose nodejs ]; }
+mkShell { buildInputs = [ docker docker-compose nodejs ]; }
