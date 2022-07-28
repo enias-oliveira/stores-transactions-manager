@@ -3,7 +3,7 @@
 
 A simple software for managing transactions by uploading and parsing a CNAB file.
 
-The Backend is built with NestJs, using Prisma ORM/(Postgres) as Database and the Frontend with Next.NestJs using MUI for UI components.
+The Backend is built with NestJs, using Prisma ORM/(Postgres) as Database and the Frontend with NextJs using MUI for UI components.
 
 Ths repository has a minimal CI/CD setup via Github Actions, that automatically builds the application and deploys on Heroku.
 
